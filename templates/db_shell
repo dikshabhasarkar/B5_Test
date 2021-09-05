@@ -1,0 +1,76 @@
+>>> from boards.models import Post
+>>> Post.objects.all()
+<QuerySet [<Post: high level programing language>, <Post: It is a Structured Query lang…>, <Post: Good Morning. Have a nice day.>, <Post: their are two types
+1. built…>, <Post: different types of shapes...>, <Post: operating system>, <Post: todays news>, <Post: Different types:English
+Hi…>, <Post: Good Night...Sweet Dreams....…>]>
+>>> Post.objects.count()
+9
+
+>>> from boards.models import Board, Post
+>>> board = Board.objects.get(name='Django')
+>>> board.topics.all()
+<QuerySet [<Topic: SQl>, <Topic: Hi......!!!>, <Topic: computer>]>
+>>> board.topics.count()
+3
+>>> Post.objects.count()
+9
+
+>>> Post.objects.filter(topic__board=board)
+<QuerySet [<Post: It is a Structured Query lang…>, <Post: Good Morning. Have a nice day.>, <Post: operating system>]>   
+>>> Post.objects.filter(topic__board=board).count()
+3
+>>> Post.objects.filter(topic__board=board).order_by('-created_at')
+<QuerySet [<Post: operating system>, <Post: Good Morning. Have a nice day.>, <Post: It is a Structured Query lang…>]>   
+>>> Post.objects.filter(topic__board=board).order_by('-created_at').first()
+<Post: operating system>
+>>>
+
+>>> from django.db.models import Count
+>>> from boards.models import Board
+>>> board = Board.objects.get(name='Django')
+>>> topics = board.topics.order_by('-last_updated').annotate(replies=Count('posts'))
+>>> for topic in topics:
+...     print(topic.replies)
+... 
+1
+1
+1
+---------------------------------------------------------------
+
+(denv) F:\python practice\B5_practice\Django\myproject>python manage.py shell
+Python 3.8.6 (tags/v3.8.6:db45529, Sep 23 2020, 15:52:53) [MSC v.1927 64 bit (AMD64)] on win32                          n manage.py shell
+Type "help", "copyright", "credits" or "license" for more inSC v.1927 64 bit (AMD64)] on win32formation.                                                  formation.
+(InteractiveConsole)
+>>> from boards.models import Topic
+>>> Topic.objects.count()
+11
+>>> Topic.objects.filter(board__name='Django').count()
+3
+>>> queryset = Topic.objects.filter(board__name='Django').order_by('-last_updated')
+>>> 
+>>> 
+>>> queryset
+<QuerySet [<Topic: computer>, <Topic: Hi......!!!>, <Topic: 
+SQl>]>
+>>> from django.core.paginator import Paginator
+>>> paginator = Paginator(queryset, 3)  
+>>> 
+>>> paginator.count
+5
+>>> paginator.page(2)
+<Page 2 of 2>
+>>> page=paginator.page(2)
+>>> type(page)
+<class 'django.core.paginator.Page'>
+>>> type(paginator) 
+<class 'django.core.paginator.Paginator'>
+
+>>> page=paginator.page(1) 
+>>> page.has_next()
+True
+>>> page.has_previous()
+False
+>>> page.has_other_pages()
+True
+>>> page.next_page_number()
+2
